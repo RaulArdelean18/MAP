@@ -1,0 +1,3 @@
+Expresia 2+3*i * (1 + (2-i) * (3 + (4 - 5*i))) este valida.
+Forma postfixata: 2+3*i 1 2-i 3 4 5*i - + * + *
+Rezultat: 71-4*i

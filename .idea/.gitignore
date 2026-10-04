@@ -1,0 +1,17 @@
+# Fisiere de configurare IDE
+**/.idea/
+**/*.iml
+
+# Foldere de compilare si build (inclusiv din subfoldere)
+**/out/
+**/build/
+out/
+build/
+
+# Toate fisierele compilate de Java
+**/*.class
+*.class
+
+# Sistem
+.DS_Store
+Thumbs.db

@@ -1,0 +1,17 @@
+public class DivideOperation implements ComplexOperation {
+
+    @Override
+    public ComplexNumber apply(ComplexNumber a, ComplexNumber b) {
+        return a.divide(b);
+    }
+
+    @Override
+    public char getSymbol() {
+        return '/';
+    }
+
+    @Override
+    public int getPrecedence() {
+        return 2;
+    }
+}

@@ -1,42 +1,33 @@
-package parser;
-
-import exception.ExpressionException;
-import Domain.ComplexNumber;
-
 /**
- * Parsing the ComplexNumbers as: a, b*i, i, -i, a+b*i, a-b*i, -2+i etc.
+ * Parses a single complex number such as: 5, i, -i, 3*i, 2+3*i, 2-3*i, -2+i ...
  */
-public class ComplexNumberParser implements NumberParser {
+public class ComplexNumberParser {
 
-    @Override
-    public boolean isValid(String token) {
+    public boolean isComplexNumber(String s) {
         try {
-            parse(token);
+            parse(s);
             return true;
-        } catch (ExpressionException e) {
+        } catch (InvalidExpressionException e) {
             return false;
         }
     }
 
-    @Override
-    public ComplexNumber parse(String token) throws ExpressionException {
-        if (token == null || token.length() == 0) {
-            throw invalid(token);
+    public ComplexNumber parse(String s) throws InvalidExpressionException {
+        if (s == null || s.length() == 0) {
+            throw invalid(s);
         }
 
-        int[] starts = new int[3];
-        int cnt = 1; // starts[0] = 0
-        for (int i = 1; i < token.length(); i++) {
-            char c = token.charAt(i);
+        // A '+' or '-' (not at position 0) starts a new term.
+        int[] starts = new int[2];
+        int count = 1; // starts[0] = 0
+        for (int i = 1; i < s.length(); i++) {
+            char c = s.charAt(i);
             if (c == '+' || c == '-') {
-                if (cnt == 3) {
-                    throw invalid(token);
+                if (count == 2) {
+                    throw invalid(s);
                 }
-                starts[cnt++] = i;
+                starts[count++] = i;
             }
-        }
-        if (cnt > 2) {
-            throw invalid(token);
         }
 
         double re = 0;
@@ -44,30 +35,30 @@ public class ComplexNumberParser implements NumberParser {
         boolean hasRe = false;
         boolean hasIm = false;
 
-        for (int t = 0; t < cnt; t++) {
+        for (int t = 0; t < count; t++) {
             int from = starts[t];
-            int to = (t + 1 < cnt) ? starts[t + 1] : token.length();
-            String term = token.substring(from, to);
+            int to = (t + 1 < count) ? starts[t + 1] : s.length();
+            String term = s.substring(from, to);
 
             if (term.endsWith("i")) {
                 if (hasIm) {
-                    throw invalid(token);
+                    throw invalid(s);
                 }
-                im = parseImaginary(term, token);
+                im = parseImaginary(term, s);
                 hasIm = true;
             } else {
                 if (hasRe) {
-                    throw invalid(token);
+                    throw invalid(s);
                 }
-                re = parseReal(term, token);
+                re = parseReal(term, s);
                 hasRe = true;
             }
         }
         return new ComplexNumber(re, im);
     }
 
-    /** Token who ends with 'i': "i", "+i", "-i", "3i", "3*i", "-3.5*i". */
-    private double parseImaginary(String term, String whole) throws ExpressionException {
+    /** Term ending with 'i': "i", "+i", "-i", "3i", "3*i", "-3.5*i". */
+    private double parseImaginary(String term, String whole) throws InvalidExpressionException {
         if (term.endsWith("*i")) {
             return parseReal(term.substring(0, term.length() - 2), whole);
         }
@@ -81,8 +72,8 @@ public class ComplexNumberParser implements NumberParser {
         return parseReal(coefficient, whole);
     }
 
-    /** Real number*/
-    private double parseReal(String text, String whole) throws ExpressionException {
+    /** Real number with optional sign and optional decimal point. */
+    private double parseReal(String text, String whole) throws InvalidExpressionException {
         int start = 0;
         if (text.length() > 0 && (text.charAt(0) == '+' || text.charAt(0) == '-')) {
             start = 1;
@@ -105,7 +96,7 @@ public class ComplexNumberParser implements NumberParser {
         return Double.parseDouble(text);
     }
 
-    private ExpressionException invalid(String token) {
-        return new ExpressionException("Complex number invalid: " + token);
+    private InvalidExpressionException invalid(String s) {
+        return new InvalidExpressionException("Invalid complex number: " + s);
     }
 }

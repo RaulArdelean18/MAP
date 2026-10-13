@@ -1,3 +1,7 @@
+package service;
+
+import Domain.ComplexNumber;
+
 public class DivideOperation implements ComplexOperation {
 
     @Override

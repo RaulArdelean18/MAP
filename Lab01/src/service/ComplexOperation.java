@@ -1,3 +1,7 @@
+package service;
+
+import Domain.ComplexNumber;
+
 /**
  * Strategy: a binary operation between two complex numbers.
  */

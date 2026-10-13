@@ -1,3 +1,5 @@
+package Structures;
+
 /**
  * Queue on a plain array (grows when full). push = enqueue, pop = dequeue.
  */

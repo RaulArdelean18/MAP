@@ -1,5 +1,11 @@
+package Postfix;
+
+import Token.*;
+import Structures.*;
+import Exception.InvalidExpressionException;
+
 /**
- * Shunting-yard: infix tokens -> postfix tokens (using ArrayStack and ArrayQueue).
+ * Shunting-yard: infix tokens -> postfix tokens (using Structures.ArrayStack and Structures.ArrayQueue).
  */
 public class InfixToPostfixConverter {
 

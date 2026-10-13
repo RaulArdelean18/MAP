@@ -1,3 +1,9 @@
+package Parser;
+
+import Exception.InvalidExpressionException;
+import Token.Token;
+import Token.TokenType;
+
 /**
  * Checks the syntax of a token sequence: operand/operator alternation and balanced parentheses.
  */

@@ -1,3 +1,8 @@
+package Token;
+
+import Domain.ComplexNumber;
+import service.*;
+
 /**
  * One element of the expression: a number, an operator or a parenthesis.
  */
@@ -44,11 +49,11 @@ public class Token {
     @Override
     public String toString() {
         switch (type) {
-            case NUMBER:
+            case TokenType.NUMBER:
                 return "(" + number + ")";
-            case OPERATOR:
+            case TokenType.OPERATOR:
                 return String.valueOf(operation.getSymbol());
-            case LEFT_PAREN:
+            case TokenType.LEFT_PAREN:
                 return "(";
             default:
                 return ")";

@@ -1,3 +1,5 @@
+package Exception;
+
 /**
  * Thrown when the expression (or one of its tokens) is not valid.
  */

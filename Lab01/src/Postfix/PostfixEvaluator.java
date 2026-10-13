@@ -1,3 +1,10 @@
+package Postfix;
+
+import Domain.ComplexNumber;
+import Token.*;
+import Structures.*;
+import Exception.InvalidExpressionException;
+
 /**
  * Evaluates a postfix expression using an operand stack.
  */

@@ -1,3 +1,7 @@
+package service;
+
+import Exception.InvalidExpressionException;
+
 /**
  * Singleton + Simple Factory for the operations.
  */

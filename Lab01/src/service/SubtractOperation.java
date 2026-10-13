@@ -1,13 +1,17 @@
-public class AddOperation implements ComplexOperation {
+package service;
+
+import Domain.ComplexNumber;
+
+public class SubtractOperation implements ComplexOperation {
 
     @Override
     public ComplexNumber apply(ComplexNumber a, ComplexNumber b) {
-        return a.add(b);
+        return a.subtract(b);
     }
 
     @Override
     public char getSymbol() {
-        return '+';
+        return '-';
     }
 
     @Override

@@ -1,3 +1,8 @@
+package Parser;
+
+import Domain.ComplexNumber;
+import Exception.InvalidExpressionException;
+
 /**
  * Parses a single complex number such as: 5, i, -i, 3*i, 2+3*i, 2-3*i, -2+i ...
  */

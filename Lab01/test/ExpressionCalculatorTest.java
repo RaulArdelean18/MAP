@@ -1,3 +1,5 @@
+import Calculator.ExpressionCalculator;
+import Domain.ComplexNumber;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -6,13 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- * End-to-end tests: the expression is split into arguments exactly like the shell does
- * (one argument per space-separated token) and given to ExpressionCalculator.
- */
+import Exception.InvalidExpressionException;
+
 class ExpressionCalculatorTest {
 
-    private static final double EPS = 1e-9;
+    private static final double EPS = 1e-4;
 
     // ---------------------------------------------------------------- helpers
 
@@ -31,18 +31,16 @@ class ExpressionCalculatorTest {
         assertEquals(expectedIm, result.getIm(), EPS, "imaginary part of: " + expression);
     }
 
-    /** The expression must be rejected with an InvalidExpressionException whose message contains the fragment. */
     private static void assertInvalid(String expression, String messageFragment) {
         try {
             new ExpressionCalculator().calculate(split(expression));
-            fail("Expected InvalidExpressionException for: [" + expression + "]");
+            fail("Expected Exception.InvalidExpressionException for: [" + expression + "]");
         } catch (InvalidExpressionException e) {
             assertTrue(e.getMessage().contains(messageFragment),
                     "Wrong error for [" + expression + "]: " + e.getMessage());
         }
     }
 
-    /** The expression is syntactically valid, but dividing by zero must throw ArithmeticException. */
     private static void assertDivisionByZero(String expression) throws InvalidExpressionException {
         try {
             new ExpressionCalculator().calculate(split(expression));
@@ -286,6 +284,11 @@ class ExpressionCalculatorTest {
             assertResult("(200+103*i + 350+50*i) * 1+i", 397, 703);
         }
 
+        @Test
+        void p18extra() throws InvalidExpressionException {
+            assertResult("-33.8444-3.0357*i / 3.5501+2.7740*i", -6.3341, 4.0943);
+        }
+
     }
 
     // ---------------------------------------------------------- invalid input
@@ -415,4 +418,6 @@ class ExpressionCalculatorTest {
         }
 
     }
+
+
 }

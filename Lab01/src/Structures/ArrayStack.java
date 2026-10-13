@@ -1,3 +1,5 @@
+package Structures;
+
 /**
  * Stack on a plain array (grows when full).
  */

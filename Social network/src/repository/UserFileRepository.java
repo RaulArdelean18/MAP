@@ -4,6 +4,9 @@ import domain.User;
 import domain.validators.Validator;
 import exceptions.RepositoryException;
 
+/**
+ * Repository for managing users stored in a file.
+ */
 public class UserFileRepository extends AbstractFileRepository<Long, User> {
     public UserFileRepository(Validator<User> validator, String fileName) {
         super(validator, fileName);

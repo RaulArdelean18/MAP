@@ -10,6 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * In-memory repository for storing and managing entities.
+ */
 public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E>{
 
     protected final Map<ID,E> entities=new LinkedHashMap<>();

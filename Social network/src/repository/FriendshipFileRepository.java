@@ -8,7 +8,9 @@ import exceptions.RepositoryException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-
+/**
+ * Repository for managing friendships stored in a file.
+ */
 public class FriendshipFileRepository extends AbstractFileRepository<Tuple<Long, Long>, Friendship> {
     public FriendshipFileRepository(Validator<Friendship> validator, String fileName) {
         super(validator, fileName);

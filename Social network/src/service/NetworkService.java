@@ -4,9 +4,9 @@ import domain.Friendship;
 import domain.Tuple;
 import domain.User;
 import exceptions.ServiceException;
-import repository.FriendshipFileRepository;
 import repository.Repository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class NetworkService {
@@ -60,11 +60,11 @@ public class NetworkService {
     public void addFriend(Long id1, Long id2) {
         checkUserExists(id1);
         checkUserExists(id2);
-        friendshipRepository.save(new Friendship(id1, id2));
+        friendshipRepository.save(new Friendship(id1, id2, LocalDateTime.now()));
     }
 
     public void removeFriend(Long id1, Long id2) {
-        friendshipRepository.delete(new Friendship(id1, id2).getId());
+        friendshipRepository.delete(new Friendship(id1, id2,LocalDateTime.now()).getId());
     }
 
     public Iterable<User> getUsers() { return userRepository.findAll(); }

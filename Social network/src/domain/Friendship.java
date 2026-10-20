@@ -1,27 +1,34 @@
 package domain;
 
+import java.time.LocalDateTime;
+
+
 /**
  * Basic class for every domain friendship
  */
 public class Friendship extends Entity<Tuple<Long, Long>> {
-    public Friendship(Long a, Long b) {
-        if (a == null || b == null) {
-            this.id = null;
-            return;
+    private final LocalDateTime date;
+    public Friendship(Long a, Long b,LocalDateTime date) {
+        this.date=date;
+        if (a != null && b != null) {
+            this.id = new Tuple<>(Math.min(a, b), Math.max(a, b));
         }
-        this.id = new Tuple<>(Math.min(a, b), Math.max(a, b));
+    }
+
+    public LocalDateTime getDate() {
+        return date;
     }
 
     public Long getFirstUser() {
-        return id.first();
+        return id.getFirst();
     }
 
     public Long getSecondUser() {
-        return id.second();
+        return id.getSecond();
     }
 
     @Override
     public String toString() {
-        return id.first() + "<->" + id.second();
+        return id.getFirst() + "<->" + id.getSecond();
     }
 }

@@ -2,16 +2,24 @@ package repository;
 
 import domain.User;
 import domain.validators.Validator;
+import exceptions.RepositoryException;
 
-public class UserFileRepository extends FileRepository<Long, User>{
+public class UserFileRepository extends AbstractFileRepository<Long, User> {
     public UserFileRepository(Validator<User> validator, String fileName) {
         super(validator, fileName);
     }
 
     @Override
-    protected User fromLine(String line) {
+    protected User extractEntity(String line) {
         String[] p=line.split(";");
-        return new User(Long.parseLong(p[0]),p[1],p[2]);
+        if (p.length != 3) {
+            throw new RepositoryException("Expected 3 fields but found " + p.length);
+        }
+        try {
+            return new User(Long.parseLong(p[0]), p[1], p[2]);
+        } catch (NumberFormatException e) {
+            throw new RepositoryException("Invalid user id: '" + p[0] + "'", e);
+        }
     }
 
     @Override

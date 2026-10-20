@@ -1,0 +1,8 @@
+Generice   --------------------------------> Collections
+clase, metode
+
+public class Shape<T>{
+    .
+    .
+    .
+}

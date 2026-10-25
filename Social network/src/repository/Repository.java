@@ -22,6 +22,8 @@ public interface Repository<ID, E extends Entity<ID>> {
     Optional<E> findOne(ID id);
 
     /**
+     * Returns all the entities.
+     *
      * @return all the entities, in insertion order; the returned collection cannot be modified
      */
     Iterable<E> findAll();

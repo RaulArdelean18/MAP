@@ -122,6 +122,8 @@ public class DynamicConnectivity implements Connectivity {
     }
 
     /**
+     * Counts the connected components.
+     *
      * @return the number of connected components
      */
     @Override
@@ -130,6 +132,8 @@ public class DynamicConnectivity implements Connectivity {
     }
 
     /**
+     * Checks whether two vertices are in the same connected component.
+     *
      * @return true if both vertices exist and are in the same component (O(log n))
      */
     @Override
@@ -139,6 +143,8 @@ public class DynamicConnectivity implements Connectivity {
     }
 
     /**
+     * Lists the connected components.
+     *
      * @return the components, each as a sorted list of vertices, ordered by smallest vertex
      */
     @Override
@@ -165,6 +171,9 @@ public class DynamicConnectivity implements Connectivity {
     }
 
     /**
+     * Returns the neighbours of a vertex.
+     *
+     * @param v the vertex
      * @return a read-only view of the neighbours of v (empty if v does not exist)
      */
     @Override

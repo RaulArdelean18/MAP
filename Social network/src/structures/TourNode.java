@@ -17,6 +17,14 @@ final class TourNode {
     boolean flagB;          // arc node: the edge is a tree edge of exactly this level
     boolean subA, subB;     // OR of the flags in the subtree
 
+    /**
+     * Creates a new {@code TourNode}.
+     *
+     * @param priority the random priority of the treap
+     * @param isLoop   true for the loop node of a vertex, false for an arc
+     * @param vertex   the vertex, for a loop node
+     * @param edge     the edge, for an arc node
+     */
     TourNode(int priority, boolean isLoop, long vertex, Edge edge) {
         this.priority = priority;
         this.isLoop = isLoop;
@@ -25,10 +33,24 @@ final class TourNode {
         this.loops = isLoop ? 1 : 0;
     }
 
+    /**
+     * Creates the loop node of a vertex.
+     *
+     * @param priority the random priority of the treap
+     * @param vertex   the vertex
+     * @return the loop node of the vertex
+     */
     static TourNode loop(int priority, long vertex) {
         return new TourNode(priority, true, vertex, null);
     }
 
+    /**
+     * Creates a node for one arc of an edge.
+     *
+     * @param priority the random priority of the treap
+     * @param edge     the edge
+     * @return a node for one arc of the edge
+     */
     static TourNode arc(int priority, Edge edge) {
         return new TourNode(priority, false, -1, edge);
     }

@@ -1,8 +1,8 @@
 package service;
 
-import java.util.Collection;
+import structures.Connectivity;
+
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Strategy for choosing the "most sociable" community among the given ones.
@@ -10,9 +10,11 @@ import java.util.function.Function;
 public interface SociableCommunityFinder {
 
     /**
+     * Chooses the most sociable community.
+     *
      * @param communities the connected components, as lists of user ids
-     * @param neighbours  gives the friends of a user
+     * @param connectivity the structure that knows the friends of every user
      * @return the chosen community, or an empty list if there are none
      */
-    List<Long> find(List<List<Long>> communities, Function<Long, ? extends Collection<Long>> neighbours);
+    List<Long> find(List<List<Long>> communities, Connectivity connectivity);
 }

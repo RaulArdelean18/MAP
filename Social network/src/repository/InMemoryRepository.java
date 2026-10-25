@@ -12,13 +12,20 @@ import java.util.Optional;
 /**
  * In-memory repository for storing and managing entities.
  * Entities are validated before they are saved and kept in insertion order.
+ *
+ * @param <ID> type of the entity id
+ * @param <E>  type of the entity
  */
 public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<ID, E> {
 
+    /** The stored entities, in insertion order. */
     protected final Map<ID, E> entities = new LinkedHashMap<>();
+    /** The validation strategy applied before saving. */
     protected final Validator<E> validator;
 
     /**
+     * Creates a new {@code InMemoryRepository}.
+     *
      * @param validator the validation strategy applied by {@link #save(Entity)}
      */
     public InMemoryRepository(Validator<E> validator) {

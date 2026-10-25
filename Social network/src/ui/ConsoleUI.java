@@ -16,10 +16,20 @@ public class ConsoleUI {
     private final NetworkService service;
     private final Scanner in = new Scanner(System.in);
 
+    /**
+     * Creates a new {@code ConsoleUI}.
+     *
+     * @param service the service used for every action of the menu
+     */
     public ConsoleUI(NetworkService service) {
         this.service = service;
     }
 
+    /**
+     * Shows the menu and executes the chosen actions until the user chooses 0 or the input ends.
+     * Expected errors (invalid data, storage or service errors) are shown as messages and
+     * do not stop the loop.
+     */
     public void run() {
         while (true) {
             printMenu();

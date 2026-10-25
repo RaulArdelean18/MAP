@@ -8,14 +8,23 @@ import java.util.Objects;
  * @param <ID> the type of the identifier
  */
 public abstract class Entity<ID> {
+    /** The identifier of this entity. */
     protected ID id;
 
-    /** @return the identifier of this entity */
+    /**
+     * Returns the identifier of this entity.
+     *
+     * @return the identifier of this entity
+     */
     public ID getId() {
         return id;
     }
 
-    /** @param id the new identifier */
+    /**
+     * Sets the identifier of this entity.
+     *
+     * @param id the new identifier
+     */
     public void setId(ID id) {
         this.id = id;
     }

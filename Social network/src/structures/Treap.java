@@ -9,10 +9,23 @@ final class Treap {
     private Treap() {
     }
 
+    /**
+     * Returns the size of a treap.
+     *
+     * @param t the root of a treap, or null
+     * @return the number of nodes in the treap (0 for null)
+     */
     static int sizeOf(TourNode t) {
         return t == null ? 0 : t.size;
     }
 
+    /**
+     * Concatenates two sequences.
+     *
+     * @param a the first sequence, or null
+     * @param b the second sequence, or null
+     * @return the root of the concatenation
+     */
     static TourNode merge(TourNode a, TourNode b) {
         if (a == null) return b;
         if (b == null) return a;
@@ -62,6 +75,12 @@ final class Treap {
         return r;
     }
 
+    /**
+     * Finds the root of the treap that contains a node.
+     *
+     * @param x a node
+     * @return the root of the treap that contains x
+     */
     static TourNode rootOf(TourNode x) {
         TourNode cur = x;
         while (cur.parent != null) cur = cur.parent;
@@ -69,6 +88,8 @@ final class Treap {
     }
 
     /**
+     * Finds the position of a node in its sequence.
+     *
      * @return the position of x in its sequence, counting from 0
      */
     static int indexOf(TourNode x) {
@@ -86,17 +107,31 @@ final class Treap {
         for (TourNode c = n; c != null; c = c.parent) c.update();
     }
 
+    /**
+     * Sets flagA of a node and refreshes the aggregates above it.
+     *
+     * @param n     the node
+     * @param value the new value
+     */
     static void setFlagA(TourNode n, boolean value) {
         n.flagA = value;
         refreshUp(n);
     }
 
+    /**
+     * Sets flagB of a node and refreshes the aggregates above it.
+     *
+     * @param n     the node
+     * @param value the new value
+     */
     static void setFlagB(TourNode n, boolean value) {
         n.flagB = value;
         refreshUp(n);
     }
 
     /**
+     * Finds a node with flagA set.
+     *
      * @return some node with flagA set; the subtree must have subA set
      */
     static TourNode findA(TourNode t) {
@@ -109,6 +144,8 @@ final class Treap {
     }
 
     /**
+     * Finds a node with flagB set.
+     *
      * @return some node with flagB set; the subtree must have subB set
      */
     static TourNode findB(TourNode t) {

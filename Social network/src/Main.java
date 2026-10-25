@@ -19,9 +19,20 @@ import structures.Connectivity;
 import structures.DynamicConnectivity;
 import ui.ConsoleUI;
 
+/**
+ * Entry point of the application. Builds the object graph (repositories through the
+ * {@link repository.RepositoryFactory}, services, user interface) and starts the console UI.
+ */
 public class Main {
     private static final String CONFIG_FILE = "src/main/resources/config.properties";
 
+    /**
+     * Starts the application. If the persistence cannot be initialised (missing or invalid
+     * configuration, unreadable data file, database not implemented yet), a message is
+     * printed and the program ends.
+     *
+     * @param args command line arguments, not used
+     */
     public static void main(String[] args) {
         ConsoleUI ui;
         try {

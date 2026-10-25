@@ -17,6 +17,8 @@ public class UserDbRepository implements Repository<Long, User> {
     private final String password;
 
     /**
+     * Creates a new {@code UserDbRepository}.
+     *
      * @param validator the validation strategy
      * @param url       the JDBC url of the database (db.url)
      * @param user      the database user (db.user)
@@ -30,6 +32,8 @@ public class UserDbRepository implements Repository<Long, User> {
     }
 
     /**
+     * Finds an entity by its id (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override
@@ -38,6 +42,8 @@ public class UserDbRepository implements Repository<Long, User> {
     }
 
     /**
+     * Returns all the entities (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override
@@ -46,6 +52,8 @@ public class UserDbRepository implements Repository<Long, User> {
     }
 
     /**
+     * Saves a new entity (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override
@@ -54,6 +62,8 @@ public class UserDbRepository implements Repository<Long, User> {
     }
 
     /**
+     * Deletes the entity with the given id (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override

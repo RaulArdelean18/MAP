@@ -12,6 +12,13 @@ import java.time.format.DateTimeParseException;
  * Repository for managing friendships stored in a file.
  */
 public class FriendshipFileRepository extends AbstractFileRepository<Tuple<Long, Long>, Friendship> {
+    /**
+     * Creates the repository and loads the friendships from the file.
+     *
+     * @param validator the validation strategy
+     * @param fileName  relative path of the file
+     * @throws exceptions.RepositoryException if the file exists but cannot be read
+     */
     public FriendshipFileRepository(Validator<Friendship> validator, String fileName) {
         super(validator, fileName);
     }

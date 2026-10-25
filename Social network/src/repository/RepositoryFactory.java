@@ -15,6 +15,8 @@ public class RepositoryFactory {
     private final RepositoryConfig config;
 
     /**
+     * Creates a new {@code RepositoryFactory}.
+     *
      * @param config the persistence settings
      */
     public RepositoryFactory(RepositoryConfig config) {
@@ -22,6 +24,8 @@ public class RepositoryFactory {
     }
 
     /**
+     * Creates the user repository of the configured type.
+     *
      * @param validator the validation strategy for users
      * @return the user repository of the configured type
      * @throws RepositoryException if a needed property is missing or the type is unknown
@@ -42,6 +46,8 @@ public class RepositoryFactory {
     }
 
     /**
+     * Creates the friendship repository of the configured type.
+     *
      * @param validator the validation strategy for friendships
      * @return the friendship repository of the configured type
      * @throws RepositoryException if a needed property is missing or the type is unknown

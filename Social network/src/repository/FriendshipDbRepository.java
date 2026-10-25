@@ -18,6 +18,8 @@ public class FriendshipDbRepository implements Repository<Tuple<Long, Long>, Fri
     private final String password;
 
     /**
+     * Creates a new {@code FriendshipDbRepository}.
+     *
      * @param validator the validation strategy
      * @param url       the JDBC url of the database (db.url)
      * @param user      the database user (db.user)
@@ -31,6 +33,8 @@ public class FriendshipDbRepository implements Repository<Tuple<Long, Long>, Fri
     }
 
     /**
+     * Finds an entity by its id (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override
@@ -39,6 +43,8 @@ public class FriendshipDbRepository implements Repository<Tuple<Long, Long>, Fri
     }
 
     /**
+     * Returns all the entities (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override
@@ -47,6 +53,8 @@ public class FriendshipDbRepository implements Repository<Tuple<Long, Long>, Fri
     }
 
     /**
+     * Saves a new entity (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override
@@ -55,6 +63,8 @@ public class FriendshipDbRepository implements Repository<Tuple<Long, Long>, Fri
     }
 
     /**
+     * Deletes the entity with the given id (not implemented yet).
+     *
      * @throws UnsupportedOperationException always, it is not implemented yet
      */
     @Override

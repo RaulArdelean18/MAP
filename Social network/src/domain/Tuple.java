@@ -13,6 +13,8 @@ public class Tuple<E1, E2> {
     private final E2 second;
 
     /**
+     * Creates a new {@code Tuple}.
+     *
      * @param first  the first element
      * @param second the second element
      */
@@ -22,6 +24,8 @@ public class Tuple<E1, E2> {
     }
 
     /**
+     * Returns the first element.
+     *
      * @return the first element
      */
     public E1 getFirst() {
@@ -29,6 +33,8 @@ public class Tuple<E1, E2> {
     }
 
     /**
+     * Returns the second element.
+     *
      * @return the second element
      */
     public E2 getSecond() {

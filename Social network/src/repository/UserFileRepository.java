@@ -8,6 +8,13 @@ import exceptions.RepositoryException;
  * Repository for managing users stored in a file.
  */
 public class UserFileRepository extends AbstractFileRepository<Long, User> {
+    /**
+     * Creates the repository and loads the users from the file.
+     *
+     * @param validator the validation strategy
+     * @param fileName  relative path of the file
+     * @throws exceptions.RepositoryException if the file exists but cannot be read
+     */
     public UserFileRepository(Validator<User> validator, String fileName) {
         super(validator, fileName);
     }

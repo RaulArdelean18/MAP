@@ -6,6 +6,8 @@ package exceptions;
  */
 public class RepositoryException extends RuntimeException {
     /**
+     * Creates a new {@code RepositoryException}.
+     *
      * @param message description of the error
      */
     public RepositoryException(String message) {
@@ -13,6 +15,8 @@ public class RepositoryException extends RuntimeException {
     }
 
     /**
+     * Creates a new {@code RepositoryException}.
+     *
      * @param message description of the error
      * @param cause   the original exception (for example IOException)
      */

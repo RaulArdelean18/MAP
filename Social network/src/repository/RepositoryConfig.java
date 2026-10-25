@@ -40,6 +40,8 @@ public class RepositoryConfig {
     }
 
     /**
+     * Returns the configured persistence type.
+     *
      * @return the configured persistence type
      * @throws RepositoryException if the property is missing or its value is not a known type
      */
@@ -60,6 +62,8 @@ public class RepositoryConfig {
     }
 
     /**
+     * Returns the value of a required property.
+     *
      * @param key name of the property
      * @return its value, trimmed
      * @throws RepositoryException if the property is missing or blank

@@ -15,6 +15,8 @@ public class UsersExistValidator implements Validator<Friendship> {
     private final Repository<Long, User> users;
 
     /**
+     * Creates a new {@code UsersExistValidator}.
+     *
      * @param inner the validator that is applied first
      * @param users where the existence of a user is checked
      */
@@ -24,6 +26,8 @@ public class UsersExistValidator implements Validator<Friendship> {
     }
 
     /**
+     * Validates a friendship and checks that both users exist.
+     *
      * @param friendship the friendship to check
      * @throws ValidationException if the wrapped validator rejects it or one of the users does not exist
      */

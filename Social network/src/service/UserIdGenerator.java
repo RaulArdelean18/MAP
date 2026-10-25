@@ -10,6 +10,12 @@ import java.util.Set;
  */
 public class UserIdGenerator {
 
+    /**
+     * Chooses the id of a new user.
+     *
+     * @param existingUsers the users that already exist
+     * @return the smallest positive id that none of them has
+     */
     public long nextId(Iterable<User> existingUsers) {
         Set<Long> used = new HashSet<>();
         for (User u : existingUsers) used.add(u.getId());

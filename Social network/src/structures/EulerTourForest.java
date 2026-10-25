@@ -13,6 +13,12 @@ final class EulerTourForest {
     private final Random random;
     private final Map<Long, TourNode> loops = new HashMap<>();
 
+    /**
+     * Creates a new {@code EulerTourForest}.
+     *
+     * @param level  the number of the level this forest belongs to
+     * @param random source of the treap priorities
+     */
     EulerTourForest(int level, Random random) {
         this.level = level;
         this.random = random;
@@ -27,6 +33,11 @@ final class EulerTourForest {
         loop(v);
     }
 
+    /**
+     * Forgets an isolated vertex.
+     *
+     * @param v the vertex; it must have no tree edges
+     */
     void removeVertex(long v) {
         loops.remove(v);
     }
@@ -46,11 +57,20 @@ final class EulerTourForest {
 
     // ----------------------------------------------------------------- queries
 
+    /**
+     * Checks whether two vertices are in the same connected component.
+     *
+     * @param a a vertex
+     * @param b a vertex
+     * @return true if a and b are in the same tree
+     */
     boolean connected(long a, long b) {
         return root(a) == root(b);
     }
 
     /**
+     * Returns the size of the tree that contains a vertex.
+     *
      * @return the number of vertices in the tree of v
      */
     int treeSize(long v) {
@@ -58,6 +78,8 @@ final class EulerTourForest {
     }
 
     /**
+     * Returns an identifier of the tree that contains a vertex.
+     *
      * @return an identifier that is the same for all vertices of one tree
      */
     Object treeId(long v) {
@@ -66,15 +88,29 @@ final class EulerTourForest {
 
     // ------------------------------------------------------------------- marks
 
+    /**
+     * Sets the mark of a vertex (it has non-tree edges of this level).
+     *
+     * @param v     the vertex
+     * @param value the new mark
+     */
     void markVertex(long v, boolean value) {
         Treap.setFlagA(loop(v), value);
     }
 
+    /**
+     * Sets the mark of a tree edge (it belongs to exactly this level).
+     *
+     * @param e     the tree edge
+     * @param value the new mark
+     */
     void markTreeEdge(Edge e, boolean value) {
         Treap.setFlagB(e.arcUV(level), value);
     }
 
     /**
+     * Finds a marked vertex in the tree of a vertex.
+     *
      * @return a marked vertex in the tree of v, or null if there is none
      */
     Long anyMarkedVertex(long v) {
@@ -83,6 +119,8 @@ final class EulerTourForest {
     }
 
     /**
+     * Finds a marked tree edge in the tree of a vertex.
+     *
      * @return a marked tree edge in the tree of v, or null if there is none
      */
     Edge anyMarkedTreeEdge(long v) {

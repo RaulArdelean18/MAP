@@ -26,6 +26,16 @@ public class NetworkService {
     private final UserIdGenerator idGenerator;
     private final CommunityService communityService;
 
+    /**
+     * Creates a new {@code NetworkService}.
+     *
+     * @param userRepository       where the users are stored
+     * @param friendshipRepository where the friendships are stored
+     * @param connectivity         the structure that tracks the communities; it must already
+     *                             reflect the content of the repositories
+     * @param idGenerator          chooses the id of a new user
+     * @param communityService     answers the community queries
+     */
     public NetworkService(Repository<Long, User> userRepository,
                           Repository<Tuple<Long, Long>, Friendship> friendshipRepository,
                           Connectivity connectivity,
@@ -108,6 +118,8 @@ public class NetworkService {
     }
 
     /**
+     * Returns all the users.
+     *
      * @return all the users
      */
     public Iterable<User> getUsers() {
@@ -115,6 +127,8 @@ public class NetworkService {
     }
 
     /**
+     * Returns all the friendships.
+     *
      * @return all the friendships
      */
     public Iterable<Friendship> getFriendships() {
@@ -124,6 +138,8 @@ public class NetworkService {
     // ------------------------------------------------------------ communities
 
     /**
+     * Returns the communities of the network.
+     *
      * @return the communities of the network, as lists of user ids
      */
     public List<List<Long>> getCommunities() {
@@ -131,6 +147,8 @@ public class NetworkService {
     }
 
     /**
+     * Returns the number of communities.
+     *
      * @return the number of communities
      */
     public int numberOfCommunities() {
@@ -138,6 +156,8 @@ public class NetworkService {
     }
 
     /**
+     * Finds the most sociable community.
+     *
      * @return the user ids of the most sociable community, or an empty list if there are no users
      */
     public List<Long> mostSociableCommunity() {

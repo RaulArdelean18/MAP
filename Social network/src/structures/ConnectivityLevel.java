@@ -16,21 +16,39 @@ final class ConnectivityLevel {
     final EulerTourForest forest;
     private final Map<Long, Set<Long>> nonTree = new HashMap<>();
 
+    /**
+     * Creates a new {@code ConnectivityLevel}.
+     *
+     * @param index  the number of the level
+     * @param random source of the treap priorities
+     */
     ConnectivityLevel(int index, Random random) {
         this.forest = new EulerTourForest(index, random);
     }
 
+    /**
+     * Registers a non-tree edge at this level.
+     *
+     * @param e the edge
+     */
     void addNonTree(Edge e) {
         addEnd(e.u, e.v);
         addEnd(e.v, e.u);
     }
 
+    /**
+     * Forgets a non-tree edge of this level.
+     *
+     * @param e the edge
+     */
     void removeNonTree(Edge e) {
         removeEnd(e.u, e.v);
         removeEnd(e.v, e.u);
     }
 
     /**
+     * Returns the non-tree neighbours of a vertex at this level.
+     *
      * @return a copy of the non-tree neighbours of x at this level
      */
     List<Long> nonTreeNeighbours(long x) {

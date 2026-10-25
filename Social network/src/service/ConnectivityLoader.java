@@ -11,6 +11,13 @@ import structures.Connectivity;
  */
 public class ConnectivityLoader {
 
+    /**
+     * Adds every user as a vertex and every friendship between existing users as an edge.
+     *
+     * @param connectivity the structure to fill
+     * @param users        the user repository
+     * @param friendships  the friendship repository
+     */
     public void load(Connectivity connectivity,
                      Repository<Long, User> users,
                      Repository<Tuple<Long, Long>, Friendship> friendships) {

@@ -2,7 +2,7 @@
 
 A console application written in Java for managing a small social network: users, friendships, and communities. Built for the Advanced Programming Methods (MAP) course at Babeș-Bolyai University.
 
-Data is persisted in plain text files, loaded at startup and saved after every change.
+Data is persisted in plain text files (or only in memory, depending on `repository.type`), loaded at startup and saved after every change.
 
 ## Features
 
@@ -37,10 +37,15 @@ Data is persisted in plain text files, loaded at startup and saved after every c
 
 ```text
 Social network/
+├── readme.txt
 ├── data/
 │   ├── users.txt
-│   └── friendships.txt
+│   ├── friendships.txt
+│   └── test_corrupt/
+│       ├── users.txt
+│       └── friendships.txt
 └── src/
+    ├── main/resources/config.properties
     ├── Main.java
     ├── domain/
     │   ├── Entity.java
@@ -56,11 +61,28 @@ Social network/
     │   ├── InMemoryRepository.java
     │   ├── AbstractFileRepository.java
     │   ├── UserFileRepository.java
-    │   └── FriendshipFileRepository.java
+    │   ├── FriendshipFileRepository.java
+    │   ├── UserDbRepository.java
+    │   ├── FriendshipDbRepository.java
+    │   ├── UsersExistValidator.java
+    │   ├── RepositoryType.java
+    │   ├── RepositoryConfig.java
+    │   └── RepositoryFactory.java
     ├── structures/
-    │   └── RollbackDisjointSets.java
+    │   ├── Connectivity.java
+    │   ├── DynamicConnectivity.java
+    │   ├── ConnectivityLevel.java
+    │   ├── EulerTourForest.java
+    │   ├── Treap.java
+    │   ├── TourNode.java
+    │   └── Edge.java
     ├── service/
-    │   └── NetworkService.java
+    │   ├── NetworkService.java
+    │   ├── CommunityService.java
+    │   ├── ConnectivityLoader.java
+    │   ├── UserIdGenerator.java
+    │   ├── SociableCommunityFinder.java
+    │   └── LargestCommunityFinder.java
     ├── ui/
     │   └── ConsoleUI.java
     └── exceptions/
@@ -76,10 +98,10 @@ The application is organized into layers, each with a specific responsibility.
 | Layer | Responsibility |
 |---|---|
 | `ui` | Reads user input, displays results, and handles errors. |
-| `service` | Implements business logic and community operations. |
+| `service` | Implements business logic: users and friendships, community queries, id generation. |
 | `repository` | Defines CRUD operations and manages in-memory and file storage. |
 | `domain` | Contains entities and validators. |
-| `structures` | Contains generic data structures, such as the rollback-capable DSU. |
+| `structures` | Contains generic data structures, such as the fully dynamic connectivity structure. |
 | `exceptions` | Defines custom exceptions for different types of errors. |
 
 ### Domain
@@ -94,41 +116,48 @@ The application is organized into layers, each with a specific responsibility.
 - `Repository<ID, E>` defines the CRUD contract: `findOne`, `findAll`, `save`, and `delete`.
 - `InMemoryRepository` stores entities in a `LinkedHashMap`, preserving insertion order, and validates entities before saving.
 - `AbstractFileRepository` extends `InMemoryRepository` and adds file persistence. It loads data when initialized and rewrites the file after every successful save or delete. If writing fails, the in-memory change is undone.
-- `UserFileRepository` and `FriendshipFileRepository` define how entities are converted to and from text lines.
+- `UserFileRepository` and `FriendshipFileRepository` define how entities are converted to and from text lines (`extractEntity` and `createEntityAsString`).
+- `UserDbRepository` and `FriendshipDbRepository` are skeletons for the database laboratory: they take the validator and the connection parameters, and every method throws `UnsupportedOperationException`.
+- `UsersExistValidator` decorates the friendship validator so that a friendship is accepted only between existing users, also for the lines loaded from the file.
+- `RepositoryFactory` is a Simple Factory and the only class that knows the concrete repositories. It creates them for the type configured in `src/main/resources/config.properties` (`MEMORY`, `FILE` or `DATABASE`, see `RepositoryType`), which `RepositoryConfig` reads with `java.util.Properties`. A missing or unknown value throws a `RepositoryException` with a clear message. `Main`, the UI and the services depend only on `Repository`.
+
+The details of the factory, the handling of missing files and corrupt lines, and the design principles and patterns are described in `readme.txt`.
 
 ### Service
 
-`NetworkService` implements the application's business logic and accesses storage through the `Repository` interface.
+Each class in `service` has one responsibility, and all of them depend on abstractions (`Repository`, `Connectivity`, `SociableCommunityFinder`) injected from `Main`.
 
-It manages users and friendships, maintains the DSU structure, computes communities, and identifies the most sociable community.
+| Class | Responsibility |
+|---|---|
+| `NetworkService` | The only service the UI talks to. Adds and removes users and friendships, keeps the `Connectivity` in sync, and delegates community queries to `CommunityService`. |
+| `CommunityService` | Read-only community queries: list, count, most sociable. Used through `NetworkService`. |
+| `ConnectivityLoader` | Fills a `Connectivity` from the repositories at startup. |
+| `UserIdGenerator` | Chooses the id of a new user (mex). |
+| `SociableCommunityFinder` | Strategy for choosing the most sociable community. |
+| `LargestCommunityFinder` | Implementation that picks the community with the most users. |
 
-The DSU is initialized from the repositories and rebuilt when necessary after operations that remove users or friendships.
-
-When adding a friendship, the service creates a checkpoint before merging the corresponding sets. If saving the friendship fails, the DSU rolls back the changes made after that checkpoint.
+`NetworkService` changes the repository first and the connectivity afterwards, so if saving or deleting fails, the connectivity is left untouched and no rollback is needed. Removals are applied directly, without any rebuild.
 
 ### Structures
 
-`RollbackDisjointSets` implements a disjoint-set union data structure with rollback support. It is a generic data structure with no dependency on the domain entities, which is why it lives in its own `structures` package.
+`Connectivity` is the contract for tracking the connected components of a dynamic graph: `addVertex`, `removeVertex`, `addEdge`, `removeEdge`, `connected`, `componentCount`, `components`, `neighbours`.
 
-#### RollbackDisjointSets
+`DynamicConnectivity` implements it with the fully dynamic connectivity algorithm of Holm, de Lichtenberg and Thorup (2001). It is generic, with no dependency on domain entities, and it is split into small package-private helpers, each with one responsibility:
 
-`RollbackDisjointSets` maintains the connected components of the social network using a Disjoint-Set Union (DSU) data structure.
+| Class | Responsibility |
+|---|---|
+| `DynamicConnectivity` | Public API and the level logic of the algorithm (insertion, deletion, replacement edge search). |
+| `ConnectivityLevel` | One level: its spanning forest and its non-tree edges, kept in sync. |
+| `EulerTourForest` | The spanning forest of one level as Euler tour trees: `link`, `cut`, `connected`, marks. |
+| `Treap` | Treap operations (`merge`, `split`, `indexOf`, ...) on sequences of `TourNode`. Knows nothing about graphs. |
+| `TourNode` | Treap node with the aggregates needed by the searches. |
+| `Edge` | An edge with its level, its tree flag and its arcs in the forests. |
 
-Its main operations are:
-
-- `makeSet(x)`: creates a singleton set for a user.
-- `find(x)`: returns the representative of the set containing the user.
-- `union(a, b)`: merges two sets if they are different.
-- `checkpoint()`: returns a marker representing the current history size.
-- `rollbackTo(checkpoint)`: undoes successful unions performed after the checkpoint.
-- `componentCount()`: returns the current number of disjoint sets.
-- `clear()`: removes all elements and history.
-
-The implementation uses union by size to keep trees relatively shallow. Path compression is deliberately omitted because it would complicate rollback.
-
-Successful union operations are recorded in a history stack, allowing changes to be undone in reverse order.
-
-The rollback mechanism applies to union operations only. It does not undo `makeSet` operations.
+| Operation | Complexity |
+|---|---|
+| `addEdge`, `removeEdge` | O(log² n) amortized |
+| `connected` | O(log n) |
+| `componentCount` | O(1) |
 
 ### Exceptions
 
@@ -144,42 +173,20 @@ The console UI catches and displays errors as readable messages instead of allow
 
 - **Template Method:** `AbstractFileRepository` implements common file loading and saving logic. Subclasses provide `extractEntity(String)` and `toLine(E)`.
 - **Strategy:** `Validator<T>` is injected into repositories, allowing validation rules to vary independently of storage.
-- **Single Responsibility Principle:** Each layer has a distinct role, separating user interaction, business logic, storage, and validation.
-- **Dependency Inversion Principle:** `NetworkService` depends on the `Repository` interface rather than concrete file-based implementations.
-- **Open/Closed Principle:** New entity types can be supported by creating appropriate subclasses of `AbstractFileRepository`.
-- **Rollback / Undo mechanism:** `RollbackDisjointSets` records successful union operations and supports restoring a previous DSU state using checkpoints. This allows the service to undo DSU changes when saving a friendship fails.
+- **Single Responsibility Principle:** Each layer has a distinct role, and inside `service` each class has one reason to change (data changes, community queries, loading, id generation, the sociable-community algorithm).
+- **Dependency Inversion Principle:** services depend on the `Repository`, `Connectivity` and `SociableCommunityFinder` interfaces; concrete classes are created only in `Main`.
+- **Open/Closed Principle:** New entity types can be supported by subclassing `AbstractFileRepository`; a new connectivity algorithm or a new definition of "most sociable" can be added by implementing `Connectivity` or `SociableCommunityFinder`, without changing the services.
+- **Strategy:** `SociableCommunityFinder` is injected into `CommunityService`.
 
 ## Algorithms
 
 ### Number of communities
 
-The application uses a Disjoint-Set Union (DSU) data structure to maintain connected components.
-
-Initially, each user belongs to a separate set. When a friendship is added, the sets containing the two users are merged. The number of communities is maintained as the number of disjoint sets.
-
-With union by size and without path compression, the height of every tree is at most logarithmic in the number of users, so each `find` or `union` operation takes O(log V) time in the worst case, where V is the number of users.
-
-### Rollback
-
-Each successful union records the root that was attached to another root. A checkpoint stores the current history size.
-
-If a subsequent operation fails, `rollbackTo(checkpoint)` reverses all unions performed after that checkpoint and restores the component count.
-
-This avoids rebuilding the DSU when a friendship cannot be saved.
-
-### DSU rebuilding
-
-Removing users or friendships can split a connected component into several components. A standard DSU does not directly support these deletions.
-
-The service therefore marks the DSU as dirty after a removal and rebuilds it from the current repositories when a community-related operation needs an up-to-date structure.
+The number of communities is the number of connected components, maintained by `DynamicConnectivity`. Adding a friendship links two components when its endpoints are not yet connected; removing a friendship looks for a replacement edge and splits the component only if none exists. Users can be added and removed in any order, so no rebuild is ever needed.
 
 ### Most sociable community
 
-The most sociable community is defined as the connected component containing the longest elementary path.
-
-The algorithm builds an adjacency list and uses backtracking to explore paths without revisiting vertices on the current path. It examines possible starting vertices in each community and selects the community with the longest path.
-
-This algorithm can be computationally expensive for large networks because finding a longest elementary path is computationally hard in general.
+The most sociable community is the connected component with the most users. `LargestCommunityFinder` scans the list of components once, in O(C) where C is the number of communities. On a tie, the community with the smallest user id wins.
 
 ### New user ID
 
@@ -215,7 +222,7 @@ The date is an ISO-8601 `LocalDateTime`, for example:
 1;2;2026-10-14T18:30:12.345
 ```
 
-If a line is malformed or fails validation, it is skipped and a warning containing the file name and line number is printed to the error stream.
+If a line is malformed or fails validation (including a friendship with a missing user), it is skipped and a warning containing the file name, line number and reason is printed to the error stream. `data/test_corrupt/` contains example files with corrupt lines.
 
 A missing file is not an error: the repository starts empty, and the file is created on the first save.
 

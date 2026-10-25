@@ -30,19 +30,35 @@ public class ConsoleUI {
 
             try {
                 switch (option) {
-                    case "1" -> addUser();
-                    case "2" -> removeUser();
-                    case "3" -> addFriend();
-                    case "4" -> removeFriend();
-                    case "5" -> showUsers();
-                    case "6" -> showFriendships();
-                    case "7" -> showNumberOfCommunities();
-                    case "8" -> showMostSociableCommunity();
-                    case "0" -> {
+                    case "1":
+                        addUser();
+                        break;
+                    case "2":
+                        removeUser();
+                        break;
+                    case "3":
+                        addFriend();
+                        break;
+                    case "4":
+                        removeFriend();
+                        break;
+                    case "5":
+                        showUsers();
+                        break;
+                    case "6":
+                        showFriendships();
+                        break;
+                    case "7":
+                        showNumberOfCommunities();
+                        break;
+                    case "8":
+                        showMostSociableCommunity();
+                        break;
+                    case "0":
                         System.out.println("Goodbye!");
                         return;
-                    }
-                    default -> System.out.println("Invalid option. Please choose a number between 0 and 8.");
+                    default:
+                        System.out.println("Invalid option. Please choose a number between 0 and 8.");
                 }
             } catch (ValidationException | RepositoryException | ServiceException e) {
                 System.out.println("Action failed: " + e.getMessage());

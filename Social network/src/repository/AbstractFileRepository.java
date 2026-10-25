@@ -17,7 +17,11 @@ import java.nio.file.Paths;
  * In-memory repository whose content is persisted in a text file, one entity per line.
  *
  * <p>Template Method: this class implements loading and saving; subclasses only
- * define how a line is converted to an entity and back.</p>
+ * define how a line is converted to an entity ({@link #extractEntity(String)}) and back
+ * ({@link #createEntityAsString(Entity)}).</p>
+ *
+ * <p>A corrupt or invalid line is reported on the error stream (file, line number and reason)
+ * and ignored; the file is rewritten without it at the next successful change.</p>
  *
  * @param <ID> type of the entity id
  * @param <E>  type of the entity
@@ -43,6 +47,9 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends I
     /**
      * Converts a line of the file to an entity.
      *
+     * <p>It is called while the constructor of this class is running, before the fields of the
+     * subclass are initialized, so implementations must not use fields of the subclass.</p>
+     *
      * @param line a non-blank line
      * @return the entity
      * @throws RepositoryException if the line is malformed
@@ -55,7 +62,7 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends I
      * @param entity the entity
      * @return the line, without line terminator
      */
-    protected abstract String toLine(E entity);
+    protected abstract String createEntityAsString(E entity);
 
     private void loadFromFile() {
         if (!Files.exists(path)) {
@@ -90,7 +97,7 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends I
             }
             try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
                 for (E entity : entities.values()) {
-                    writer.write(toLine(entity));
+                    writer.write(createEntityAsString(entity));
                     writer.newLine();
                 }
             }

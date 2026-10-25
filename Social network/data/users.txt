@@ -10,7 +10,6 @@
 10;Radu;Dumitrescu
 11;Ioana;Stoica
 12;Mihai;Constantin
-13;Andrei;Radu
 14;Cristina;Stefan
 15;Gabriel;Florescu
 16;Diana;Munteanu
@@ -18,3 +17,7 @@
 18;Alina;Marinescu
 19;Florin;Dobre
 20;Carmen;Barbu
+21;raul;a
+22;ana;mere
+13;mere;pere
+23;claudia;pse

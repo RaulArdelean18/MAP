@@ -14,7 +14,7 @@ public class UserFileRepository extends AbstractFileRepository<Long, User> {
 
     @Override
     protected User extractEntity(String line) {
-        String[] p=line.split(";");
+        String[] p=line.split(";", -1);
         if (p.length != 3) {
             throw new RepositoryException("Expected 3 fields but found " + p.length);
         }
@@ -26,7 +26,7 @@ public class UserFileRepository extends AbstractFileRepository<Long, User> {
     }
 
     @Override
-    protected String toLine(User entity) {
+    protected String createEntityAsString(User entity) {
         return entity.getId()+";"+entity.getFirstName()+";"+entity.getLastName();
     }
 }

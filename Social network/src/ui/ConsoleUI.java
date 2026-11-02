@@ -1,20 +1,32 @@
 package ui;
 
+import domain.Friendship;
 import domain.User;
 import exceptions.RepositoryException;
 import exceptions.ServiceException;
 import exceptions.ValidationException;
 import service.NetworkService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /** Console interface with a numbered menu that is shown again after every action. */
 public class ConsoleUI {
     private final NetworkService service;
     private final Scanner in = new Scanner(System.in);
+    /** The actions of the menu, by option; option 0 (exit) is handled in {@link #run()}. */
+    private final Map<String, Runnable> actions = Map.of(
+            "1", this::addUser,
+            "2", this::removeUser,
+            "3", this::addFriend,
+            "4", this::removeFriend,
+            "5", this::showUsers,
+            "6", this::showFriendships,
+            "7", this::showNumberOfCommunities,
+            "8", this::showMostSociableCommunity);
 
     /**
      * Creates a new {@code ConsoleUI}.
@@ -39,37 +51,12 @@ public class ConsoleUI {
             System.out.println();
 
             try {
-                switch (option) {
-                    case "1":
-                        addUser();
-                        break;
-                    case "2":
-                        removeUser();
-                        break;
-                    case "3":
-                        addFriend();
-                        break;
-                    case "4":
-                        removeFriend();
-                        break;
-                    case "5":
-                        showUsers();
-                        break;
-                    case "6":
-                        showFriendships();
-                        break;
-                    case "7":
-                        showNumberOfCommunities();
-                        break;
-                    case "8":
-                        showMostSociableCommunity();
-                        break;
-                    case "0":
-                        System.out.println("Goodbye!");
-                        return;
-                    default:
-                        System.out.println("Invalid option. Please choose a number between 0 and 8.");
+                if (option.equals("0")) {
+                    System.out.println("Goodbye!");
+                    return;
                 }
+                actions.getOrDefault(option,
+                        () -> System.out.println("Invalid option. Please choose a number between 0 and 8.")).run();
             } catch (ValidationException | RepositoryException | ServiceException e) {
                 System.out.println("Action failed: " + e.getMessage());
             }
@@ -123,21 +110,15 @@ public class ConsoleUI {
     }
 
     private void showUsers() {
-        boolean any = false;
-        for (User u : service.getUsers()) {
-            System.out.println(u);
-            any = true;
-        }
-        if (!any) System.out.println("There are no users yet.");
+        List<User> users = service.getUsers();
+        if (users.isEmpty()) System.out.println("There are no users yet.");
+        else users.forEach(System.out::println);
     }
 
     private void showFriendships() {
-        boolean any = false;
-        for (var f : service.getFriendships()) {
-            System.out.println(f);
-            any = true;
-        }
-        if (!any) System.out.println("There are no friendships yet.");
+        List<Friendship> friendships = service.getFriendships();
+        if (friendships.isEmpty()) System.out.println("There are no friendships yet.");
+        else friendships.forEach(System.out::println);
     }
 
     private void showNumberOfCommunities() {
@@ -150,11 +131,13 @@ public class ConsoleUI {
             System.out.println("There are no users yet, so there is no community.");
             return;
         }
-        Map<Long, User> byId = new HashMap<>();
-        for (User u : service.getUsers()) byId.put(u.getId(), u);
+        Map<Long, User> byId = service.getUsers().stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
 
         System.out.println("Most sociable community:");
-        for (Long id : ids) System.out.println("  " + byId.get(id));
+        ids.stream()
+                .map(byId::get)
+                .forEach(u -> System.out.println("  " + u));
     }
 
     // ------------------------------------------------------------ input helpers

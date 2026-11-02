@@ -28,7 +28,6 @@ public abstract class Entity<ID> {
     public void setId(ID id) {
         this.id = id;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -6,6 +6,9 @@ import domain.User;
 import repository.Repository;
 import structures.Connectivity;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 /**
  * Fills a {@link Connectivity} from the data already stored in the repositories.
  */
@@ -21,11 +24,11 @@ public class ConnectivityLoader {
     public void load(Connectivity connectivity,
                      Repository<Long, User> users,
                      Repository<Tuple<Long, Long>, Friendship> friendships) {
-        for (User u : users.findAll()) connectivity.addVertex(u.getId());
-        for (Friendship f : friendships.findAll()) {
-            if (users.findOne(f.getFirstUser()).isPresent() && users.findOne(f.getSecondUser()).isPresent()) {
-                connectivity.addEdge(f.getFirstUser(), f.getSecondUser());
-            }
-        }
+        users.stream().
+                map(User::getId).forEach(connectivity::addVertex);
+        friendships.findAll(f -> Stream.of(f.getFirstUser(), f.getSecondUser()).
+                                map(users::findOne).
+                                allMatch(Optional::isPresent)).
+                forEach(f -> connectivity.addEdge(f.getFirstUser(), f.getSecondUser()));
     }
 }

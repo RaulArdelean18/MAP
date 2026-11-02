@@ -8,7 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Persistence settings, read from a properties file.
@@ -47,18 +49,17 @@ public class RepositoryConfig {
      */
     public RepositoryType getType() {
         String value = require(TYPE_KEY);
-        for (RepositoryType type : RepositoryType.values()) {
-            if (type.name().equalsIgnoreCase(value)) {
-                return type;
-            }
-        }
-        StringBuilder known = new StringBuilder();
-        for (RepositoryType type : RepositoryType.values()) {
-            if (known.length() > 0) known.append(", ");
-            known.append(type.name());
-        }
-        throw new RepositoryException("Unknown value '" + value + "' for property '" + TYPE_KEY
-                + "' in " + source + ". Expected one of: " + known + ".");
+        return Arrays.stream(RepositoryType.values())
+                .filter(type -> type.name().equalsIgnoreCase(value))
+                .findFirst()
+                .orElseThrow(() -> new RepositoryException("Unknown value '" + value + "' for property '"
+                        + TYPE_KEY + "' in " + source + ". Expected one of: " + knownTypes() + "."));
+    }
+
+    private static String knownTypes() {
+        return Arrays.stream(RepositoryType.values())
+                .map(RepositoryType::name)
+                .collect(Collectors.joining(", "));
     }
 
     /**

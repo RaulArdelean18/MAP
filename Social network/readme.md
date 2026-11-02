@@ -59,9 +59,9 @@ Social network/
     ├── repository/
     │   ├── Repository.java
     │   ├── InMemoryRepository.java
-    │   ├── AbstractFileRepository.java
-    │   ├── UserFileRepository.java
-    │   ├── FriendshipFileRepository.java
+    │   ├── FileRepository.java
+    │   ├── UserLines.java
+    │   ├── FriendshipLines.java
     │   ├── UserDbRepository.java
     │   ├── FriendshipDbRepository.java
     │   ├── UsersExistValidator.java
@@ -113,10 +113,10 @@ The application is organized into layers, each with a specific responsibility.
 
 ### Repository
 
-- `Repository<ID, E>` defines the CRUD contract: `findOne`, `findAll`, `save`, and `delete`.
+- `Repository<ID, E>` defines the CRUD contract: `findOne` (returns an `Optional`), `findAll`, `save`, and `delete`. Its default methods `stream()` and `findAll(Predicate<E>)` let services search with predicates instead of `findByXxx` methods.
 - `InMemoryRepository` stores entities in a `LinkedHashMap`, preserving insertion order, and validates entities before saving.
-- `AbstractFileRepository` extends `InMemoryRepository` and adds file persistence. It loads data when initialized and rewrites the file after every successful save or delete. If writing fails, the in-memory change is undone.
-- `UserFileRepository` and `FriendshipFileRepository` define how entities are converted to and from text lines (`extractEntity` and `createEntityAsString`).
+- `FileRepository` extends `InMemoryRepository` and adds file persistence. It loads data when initialized (`Files.lines`) and rewrites the file after every successful save or delete (`Files.write`). If writing fails, the in-memory change is undone. The conversion between a line and an entity is given to the constructor as two functions (`Function<String, E>` and `Function<E, String>`).
+- `UserLines` and `FriendshipLines` hold the static `parse` and `format` methods of each file format; they are passed to `FileRepository` as method references.
 - `UserDbRepository` and `FriendshipDbRepository` are skeletons for the database laboratory: they take the validator and the connection parameters, and every method throws `UnsupportedOperationException`.
 - `UsersExistValidator` decorates the friendship validator so that a friendship is accepted only between existing users, also for the lines loaded from the file.
 - `RepositoryFactory` is a Simple Factory and the only class that knows the concrete repositories. It creates them for the type configured in `src/main/resources/config.properties` (`MEMORY`, `FILE` or `DATABASE`, see `RepositoryType`), which `RepositoryConfig` reads with `java.util.Properties`. A missing or unknown value throws a `RepositoryException` with a clear message. `Main`, the UI and the services depend only on `Repository`.
@@ -171,11 +171,11 @@ The console UI catches and displays errors as readable messages instead of allow
 
 ## Design patterns and principles
 
-- **Template Method:** `AbstractFileRepository` implements common file loading and saving logic. Subclasses provide `extractEntity(String)` and `toLine(E)`.
+- **Composition with functions (Java 8):** `FileRepository` implements the file loading and saving logic and receives the line conversion as `Function` parameters (laboratory 3 used the Template Method for this).
 - **Strategy:** `Validator<T>` is injected into repositories, allowing validation rules to vary independently of storage.
 - **Single Responsibility Principle:** Each layer has a distinct role, and inside `service` each class has one reason to change (data changes, community queries, loading, id generation, the sociable-community algorithm).
 - **Dependency Inversion Principle:** services depend on the `Repository`, `Connectivity` and `SociableCommunityFinder` interfaces; concrete classes are created only in `Main`.
-- **Open/Closed Principle:** New entity types can be supported by subclassing `AbstractFileRepository`; a new connectivity algorithm or a new definition of "most sociable" can be added by implementing `Connectivity` or `SociableCommunityFinder`, without changing the services.
+- **Open/Closed Principle:** A new entity type stored in a file needs only a `parse` and a `format` function passed to `FileRepository`; a new connectivity algorithm or a new definition of "most sociable" can be added by implementing `Connectivity` or `SociableCommunityFinder`, without changing the services.
 - **Strategy:** `SociableCommunityFinder` is injected into `CommunityService`.
 
 ## Algorithms
@@ -243,4 +243,4 @@ Javadoc can be generated into the `javadoc/` directory. Open `javadoc/index.html
 
 ## Author
 
-Raul Ardelean, group 221/1, Faculty of Mathematics and Computer Science, Babeș-Bolyai University.
+Raul Ardelean, group 221/1, Faculty of Mathematics and Computer Science, Babeș-Bolyai University.

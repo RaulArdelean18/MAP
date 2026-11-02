@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Fully dynamic connectivity for an undirected graph (Holm, de Lichtenberg and Thorup, 2001).
@@ -149,25 +150,12 @@ public class DynamicConnectivity implements Connectivity {
      */
     @Override
     public List<List<Long>> components() {
-        Map<Object, List<Long>> groups = new HashMap<>();
-        for (Long v : edges.keySet()) {
-            Object tree = level(0).forest.treeId(v);
-            List<Long> g = groups.get(tree);
-            if (g == null) {
-                g = new ArrayList<Long>();
-                groups.put(tree, g);
-            }
-            g.add(v);
-        }
-        List<List<Long>> result = new ArrayList<>(groups.values());
-        for (List<Long> g : result) Collections.sort(g);
-        Collections.sort(result, new Comparator<List<Long>>() {
-            @Override
-            public int compare(List<Long> a, List<Long> b) {
-                return Long.compare(a.get(0), b.get(0));
-            }
-        });
-        return result;
+        return edges.keySet().stream()
+                .collect(Collectors.groupingBy(v -> level(0).forest.treeId(v)))
+                .values().stream()
+                .map(group -> group.stream().sorted().collect(Collectors.toList()))
+                .sorted(Comparator.comparing(group -> group.get(0)))
+                .collect(Collectors.toList());
     }
 
     /**

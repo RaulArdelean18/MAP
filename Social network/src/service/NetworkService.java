@@ -8,8 +8,11 @@ import repository.Repository;
 import structures.Connectivity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Entry point of the service layer, used by the UI. It manages users and friendships and
@@ -58,7 +61,7 @@ public class NetworkService {
      * @throws exceptions.RepositoryException if the user cannot be stored
      */
     public User addUser(String firstName, String lastName) {
-        User u = new User(idGenerator.nextId(userRepository.findAll()), firstName, lastName);
+        User u = new User(idGenerator.nextId(userRepository.stream()), firstName, lastName);
         userRepository.save(u);
         connectivity.addVertex(u.getId());
         return u;
@@ -73,16 +76,12 @@ public class NetworkService {
      * @throws exceptions.RepositoryException if the change cannot be stored
      */
     public User removeUser(Long id) {
-        checkUserExists(id);
+        findUser(id);
 
-        List<Friendship> toRemove = new ArrayList<>();
-        for (Friendship f : friendshipRepository.findAll())
-            if (f.getFirstUser().equals(id) || f.getSecondUser().equals(id)) toRemove.add(f);
-
-        for (Friendship f : toRemove) {
+        friendshipRepository.findAll(FriendshipCriteria.involving(id)).forEach(f -> {
             friendshipRepository.delete(f.getId());
             connectivity.removeEdge(f.getFirstUser(), f.getSecondUser());
-        }
+        });
 
         User removed = userRepository.delete(id);
         connectivity.removeVertex(id);
@@ -99,8 +98,8 @@ public class NetworkService {
      * @throws exceptions.RepositoryException if the friendship already exists or cannot be stored
      */
     public void addFriend(Long id1, Long id2) {
-        checkUserExists(id1);
-        checkUserExists(id2);
+        findUser(id1);
+        findUser(id2);
         friendshipRepository.save(new Friendship(id1, id2, LocalDateTime.now()));
         connectivity.addEdge(id1, id2);
     }
@@ -120,19 +119,47 @@ public class NetworkService {
     /**
      * Returns all the users.
      *
-     * @return all the users
+     * @return a new list with all the users, in insertion order
      */
-    public Iterable<User> getUsers() {
-        return userRepository.findAll();
+    public List<User> getUsers() {
+        return userRepository.stream().collect(Collectors.toList());
     }
 
     /**
      * Returns all the friendships.
      *
-     * @return all the friendships
+     * @return a new list with all the friendships, in insertion order
      */
-    public Iterable<Friendship> getFriendships() {
-        return friendshipRepository.findAll();
+    public List<Friendship> getFriendships() {
+        return friendshipRepository.stream().collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the users that satisfy a criterion. See {@link UserCriteria} for ready-made criteria;
+     * a new criterion can also be written directly as a lambda.
+     *
+     * @param criterion the condition a user must satisfy to be returned, must not be null
+     * @return a new list with the users for which {@code criterion} is true, in insertion order
+     */
+    public List<User> findUsers(Predicate<User> criterion) {
+        return userRepository.findAll(criterion);
+    }
+
+    /**
+     * Returns the friends of a user, ordered by last name and then by first name.
+     *
+     * @param id the id of the user
+     * @return a new list with the friends of the user; empty if the user has no friends
+     * @throws ServiceException if the user does not exist
+     */
+    public List<User> friendsOf(Long id) {
+        findUser(id);
+        return friendshipRepository.findAll(FriendshipCriteria.involving(id)).stream()
+                .map(f -> f.getFirstUser().equals(id) ? f.getSecondUser() : f.getFirstUser())
+                .map(userRepository::findOne)
+                .flatMap(Optional::stream)
+                .sorted(Comparator.comparing(User::getLastName).thenComparing(User::getFirstName))
+                .collect(Collectors.toList());
     }
 
     // ------------------------------------------------------------ communities
@@ -164,8 +191,9 @@ public class NetworkService {
         return communityService.mostSociableCommunity();
     }
 
-    private void checkUserExists(Long id) {
-        if (id == null || userRepository.findOne(id).isEmpty())
-            throw new ServiceException("User with id " + id + " does not exist.");
+    private User findUser(Long id) {
+        return Optional.ofNullable(id)
+                .flatMap(userRepository::findOne)
+                .orElseThrow(() -> new ServiceException("User with id " + id + " does not exist."));
     }
 }

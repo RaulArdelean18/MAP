@@ -25,6 +25,7 @@ import ui.ConsoleUI;
  */
 public class Main {
     private static final String CONFIG_FILE = "src/main/resources/config.properties";
+    private static final int MAX_NAME_LENGTH = 50;
 
     /**
      * Starts the application. If the persistence cannot be initialised (missing or invalid
@@ -47,7 +48,12 @@ public class Main {
     private static ConsoleUI createUi() {
         RepositoryFactory factory = new RepositoryFactory(new RepositoryConfig(CONFIG_FILE));
 
-        Repository<Long, User> userRepo = factory.createUserRepository(new UserValidator());
+        // a new validation rule is a lambda composed with the existing validator
+        Validator<User> nameLength = u -> {
+            if (u.getFirstName().length() > MAX_NAME_LENGTH || u.getLastName().length() > MAX_NAME_LENGTH)
+                throw new ValidationException("Names cannot be longer than " + MAX_NAME_LENGTH + " characters.");
+        };
+        Repository<Long, User> userRepo = factory.createUserRepository(new UserValidator().andThen(nameLength));
         Validator<Friendship> friendshipValidator = new UsersExistValidator(new FriendshipValidator(), userRepo);
         Repository<Tuple<Long, Long>, Friendship> friendRepo = factory.createFriendshipRepository(friendshipValidator);
 
